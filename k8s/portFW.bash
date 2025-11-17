@@ -9,10 +9,9 @@ echo ""
 declare -A PORTS
 PORTS=(
     ["backend-service"]="8000:8000"
-    ["frontend-service"]="3000:3000"
+    ["frontend-service"]="3000:7860"
     ["mlflow-service"]="5000:5000"
-    ["minio-service-api"]="9000:9000"
-    ["minio-service-console"]="9001:9001"
+    ["minio-service"]="9000:9000 9001:9001"
 )
 
 declare -A PIDS

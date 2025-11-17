@@ -56,5 +56,4 @@ spec:
     - name: console
       port: 9001
       targetPort: 9001
-  # type: ClusterIP # Chỉ chạy nội bộ
-  type: NodePort   
+  type: ClusterIP # Chỉ chạy nội bộ
