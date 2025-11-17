@@ -1,45 +1,26 @@
 #!/bin/bash
 
 echo "========================================="
-echo "  Port Forwarding 4 NexusML Services"
+echo "  Port Forwarding 4 Services (default namespace)"
 echo "========================================="
+echo ""
 
-# Namespace của bạn, nếu là default thì để default
-NS="default"
-
-# Services và ports: <service>:<local-port>:<pod-port>
+# Services và port: <service>:<local-port>:<pod-port>
 declare -A PORTS
 PORTS=(
     ["backend-service"]="8000:8000"
     ["frontend-service"]="3000:3000"
+    ["mlflow-service"]="5000:5000"
     ["minio-service-api"]="9000:9000"
     ["minio-service-console"]="9001:9001"
-    ["mlflow-service"]="5000:5000"
 )
 
 declare -A PIDS
 
-# Kiểm tra service tồn tại
-service_exists() {
-    kubectl get svc "$1" -n "$NS" >/dev/null 2>&1
-}
-
-echo "Checking services..."
-for svc in "${!PORTS[@]}"; do
-    if service_exists $svc; then
-        echo "Found: $svc"
-    else
-        echo "Error: $svc not found"
-    fi
-done
-
-echo ""
 echo "Starting port forwarding..."
-echo ""
-
 for svc in "${!PORTS[@]}"; do
     port_map=${PORTS[$svc]}
-    kubectl port-forward -n $NS service/$svc $port_map --address=0.0.0.0 >/dev/null 2>&1 &
+    kubectl port-forward service/$svc $port_map --address=0.0.0.0 >/dev/null 2>&1 &
     pid=$!
     PIDS["$svc"]=$pid
     local_port=$(echo $port_map | cut -d':' -f1)
@@ -48,10 +29,20 @@ done
 
 echo ""
 echo "========================================="
-echo "  All services are now accessible via localhost!"
+echo "  All services are now accessible!"
 echo "========================================="
-echo "Press Ctrl+C to stop all port forwarding."
 echo ""
+echo "From your local machine, run SSH tunnel:"
+echo "   ssh -i ~/.ssh/vm-k8s.pem -L 8000:localhost:8000 -L 3000:localhost:3000 -L 5000:localhost:5000 -L 9000:localhost:9000 -L 9001:localhost:9001 azureuser@40.82.143.98"
+echo ""
+echo "Then open browser / API client:"
+echo "   - Backend API:   http://localhost:8000/docs"
+echo "   - Frontend UI:   http://localhost:3000"
+echo "   - MLflow UI:     http://localhost:5000"
+echo "   - MinIO API:     http://localhost:9000"
+echo "   - MinIO Console: http://localhost:9001"
+echo ""
+echo "Press Ctrl+C to stop all port forwarding."
 
 # Cleanup khi Ctrl+C
 cleanup() {
