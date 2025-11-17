@@ -37,4 +37,5 @@ spec:
   ports:
     - port: 80 # Người dùng truy cập cổng 80 chuẩn
       targetPort: 7860 # Chuyển vào cổng 7860 của Gradio
-  type: LoadBalancer # 👈 Yêu cầu 1 IP public
+  # type: LoadBalancer # 👈 Yêu cầu 1 IP public
+  type: NodePort  
